@@ -1,6 +1,7 @@
 import { buildGraph, readGraphFile, timeit } from './common'
 import { dijkstra as dijkstraPureJS } from './purejs/dijkstra'
 import { dijkstra as dijkstraWASM } from './wasm/pkg/wasm'
+import { main } from './webgpu/dijkstra'
 // import G6 from '@antv/g6'
 
 // function reformatGraph(graph: number[][]) {
@@ -25,7 +26,9 @@ import { dijkstra as dijkstraWASM } from './wasm/pkg/wasm'
 //   }
 // }
 
-async function main() {
+main()
+
+async function main3() {
   const loop = 10
   const size = 100
   console.log(`loop = ${loop}; size = ${size}`)
@@ -62,5 +65,3 @@ async function main() {
   })
   console.log('Avg Time', Number(timeWASM / loop).toFixed(2), 'ms')
 }
-
-main()

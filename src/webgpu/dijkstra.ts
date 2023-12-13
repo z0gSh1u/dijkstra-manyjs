@@ -1,48 +1,26 @@
 import { buildGraph, readGraphFile } from '../common'
+import ShaderCode from './dijkstra.wgsl'
 
 export async function main() {
-  const size = 100
+  const size = 500
+  const inf = 0
   const graph = buildGraph(await readGraphFile(`./graph/${size}.graph`))
-  const flattenGraph = new Float32Array(graph.flat())
+  let flattenGraph = new Float32Array(graph.flat())
+  flattenGraph = flattenGraph.map((v) => (v === Infinity ? inf : v))
 
   const adapter = (await navigator.gpu.requestAdapter()) as GPUAdapter
+  const adapterInfo = await adapter.requestAdapterInfo()
+  console.log(adapterInfo)
+
   const device = await adapter.requestDevice()
 
   const module = device.createShaderModule({
     label: 'dijkstra_shader',
-    code: `
-    @group(0) @binding(0) var<storage, read> graph: array<f32>; // the graph
-    @group(0) @binding(1) var<storage, read_write> dist: array<f32>;
-          
-    @compute @workgroup_size(1) fn dijkstra(
-      @builtin(global_invocation_id) gid: vec3<u32>
-    ) {
-      var size = ${size}u;
-      var visited = array<bool, ${size}>();
-      var minDist = f32(0x1.fffffep+127f); // infinity
-      var minIndex = i32(-1);
-    
-      for (var i = 0u; i < u32(size); i++) {
-        if (!visited[i] && dist[gid.x * size + i] <= minDist) {
-          minDist = dist[gid.x * size + i];
-          minIndex = i32(i);
-        }
-        if (minIndex == -1) {
-          return;
-        }
-        visited[minIndex] = true;
-        for (var j = 0u; j < u32(size); j++) {
-          if (!visited[j] && graph[minIndex * i32(size) + i32(j)] != 0.0f) {
-            dist[gid.x * size + j] = min(dist[gid.x * size + j], dist[i32(gid.x) * i32(size) + minIndex] + graph[minIndex * i32(size) + i32(j)]);
-          }
-        }
-      }
-    }
-    `.trim(),
+    code: ShaderCode,
   })
 
   const pipeline = device.createComputePipeline({
-    label: 'dijkstra',
+    label: 'dijkstra_pipeline',
     layout: 'auto',
     compute: {
       module,
@@ -89,7 +67,7 @@ export async function main() {
   const pass = encoder.beginComputePass()
   pass.setPipeline(pipeline)
   pass.setBindGroup(0, bindGroup)
-  pass.dispatchWorkgroups(size)
+  pass.dispatchWorkgroups(100, 5, 1)
   pass.end()
   encoder.copyBufferToBuffer(
     distBuffer,
@@ -99,7 +77,7 @@ export async function main() {
     size * size * Float32Array.BYTES_PER_ELEMENT
   )
   device.queue.submit([encoder.finish()])
-  
+
   await device.queue.onSubmittedWorkDone()
   await distReadBuffer.mapAsync(GPUMapMode.READ)
   const result = new Float32Array(distReadBuffer.getMappedRange())
