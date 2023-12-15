@@ -4,6 +4,7 @@ import VitePluginWasm from 'vite-plugin-wasm'
 import VitePluginPlainText from 'vite-plugin-plain-text'
 
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
     VitePluginWasm(),
