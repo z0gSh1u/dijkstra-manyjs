@@ -1,6 +1,36 @@
+import { PriorityQueue } from '@datastructures-js/priority-queue'
+
 /**
- * The most basic implementation of Dijkstra's algorithm.
- * O(n^2) without heap optimization.
+ * Dijkstra's algorithm with heap (priority queue) optimization.
+ * O(V+ElogV)
+ */
+export function dijkstraHeapOptim(graph: number[][], start: number) {
+  const size = graph.length
+  const dist = new Array(size).fill(Infinity)
+  const visited = new Array(size).fill(false)
+  dist[start] = 0
+  // Minimum priority queue for fast access to the closest node.
+  const queue = new PriorityQueue<number>((a, b) => dist[a] - dist[b])
+  queue.enqueue(start)
+  while (!queue.isEmpty()) {
+    const minIndex = queue.dequeue()
+    if (visited[minIndex]) {
+      continue
+    }
+    visited[minIndex] = true
+    for (let j = 0; j < size; j++) {
+      if (!visited[j] && graph[minIndex][j] !== Infinity) {
+        dist[j] = Math.min(dist[j], dist[minIndex] + graph[minIndex][j])
+        queue.enqueue(j)
+      }
+    }
+  }
+  return dist
+}
+
+/**
+ * The most basic implementation of Dijkstra's algorithm without heap optimization.
+ * O(V^2)
  */
 export function dijkstra(graph: number[][], start: number) {
   const size = graph.length

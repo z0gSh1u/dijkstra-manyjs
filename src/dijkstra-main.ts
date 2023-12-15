@@ -1,6 +1,6 @@
-import { buildGraph, readGraphFile, timeit } from './common'
-import { dijkstra as dijkstraPureJS } from './purejs/dijkstra'
-import { dijkstra as dijkstraWASM } from './wasm/pkg/wasm'
+// import { buildGraph, readGraphFile, timeit } from './common'
+// import { dijkstra as dijkstraPureJS } from './purejs/dijkstra'
+// import { dijkstra as dijkstraWASM } from './wasm/pkg/wasm'
 import { main } from './webgpu/dijkstra'
 // import G6 from '@antv/g6'
 
@@ -28,40 +28,40 @@ import { main } from './webgpu/dijkstra'
 
 main()
 
-async function main3() {
-  const loop = 10
-  const size = 100
-  console.log(`loop = ${loop}; size = ${size}`)
+// async function main3() {
+//   const loop = 10
+//   const size = 100
+//   console.log(`loop = ${loop}; size = ${size}`)
 
-  const graph = buildGraph(await readGraphFile(`./graph/${size}.graph`))
-  const flattenGraph = new Float32Array(graph.flat())
+//   const graph = buildGraph(await readGraphFile(`./graph/${size}.graph`))
+//   const flattenGraph = new Float32Array(graph.flat())
 
-  // const g6Data = reformatGraph(graph)
-  // const g6Graph = new G6.Graph({
-  //   container: 'graph-container',
-  //   width: 1024,
-  //   height: 1024,
-  // })
-  // g6Graph.data(g6Data)
-  // g6Graph.render()
+//   // const g6Data = reformatGraph(graph)
+//   // const g6Graph = new G6.Graph({
+//   //   container: 'graph-container',
+//   //   width: 1024,
+//   //   height: 1024,
+//   // })
+//   // g6Graph.data(g6Data)
+//   // g6Graph.render()
 
-  console.log('PureJS computing...')
-  const timePureJS = await timeit(() => {
-    for (let _ = 0; _ < loop; _++) {
-      for (let i = 0; i < size; i++) {
-        dijkstraPureJS(graph, i)
-      }
-    }
-  })
-  console.log('Avg Time', Number(timePureJS / loop).toFixed(2), 'ms')
+//   console.log('PureJS computing...')
+//   const timePureJS = await timeit(() => {
+//     for (let _ = 0; _ < loop; _++) {
+//       for (let i = 0; i < size; i++) {
+//         dijkstraPureJS(graph, i)
+//       }
+//     }
+//   })
+//   console.log('Avg Time', Number(timePureJS / loop).toFixed(2), 'ms')
 
-  console.log('WASM computing...')
-  const timeWASM = await timeit(() => {
-    for (let _ = 0; _ < loop; _++) {
-      for (let i = 0; i < size; i++) {
-        dijkstraWASM(flattenGraph, size, i)
-      }
-    }
-  })
-  console.log('Avg Time', Number(timeWASM / loop).toFixed(2), 'ms')
-}
+//   console.log('WASM computing...')
+//   const timeWASM = await timeit(() => {
+//     for (let _ = 0; _ < loop; _++) {
+//       for (let i = 0; i < size; i++) {
+//         dijkstraWASM(flattenGraph, size, i)
+//       }
+//     }
+//   })
+//   console.log('Avg Time', Number(timeWASM / loop).toFixed(2), 'ms')
+// }

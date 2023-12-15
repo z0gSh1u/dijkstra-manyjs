@@ -1,22 +1,50 @@
-import { useState } from 'react'
+import ApproachBlock from './page/ApproachBlock'
+import Header from './page/Header'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const approaches = [
+    {
+      name: 'Pure JS',
+      description: 'Pure JavaScript w/o Heap Optimization, O(V^2)',
+      executor: () => ({ time: 0, dist: [[]] }),
+    },
+    {
+      name: 'Pure JS Heap',
+      description: 'Pure JavaScript w/ Heap Optimization, O(V + ElogV)',
+      executor: () => ({ time: 0, dist: [[]] }),
+    },
+    {
+      name: 'WASM',
+      description: 'Rust wasm_bindgen, O(V^2)',
+      executor: () => ({ time: 0, dist: [[]] }),
+    },
+    {
+      name: 'WebGPU',
+      description: 'Parallel, O(V^2)',
+      executor: () => ({ time: 0, dist: [[]] }),
+    },
+  ]
 
   return (
     <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Header></Header>
+      <p>Select a graph size</p>
+      <select>
+        <option value="100">100 Nodes</option>
+        <option value="500">500 Nodes</option>
+      </select>
+
+      {approaches.map((approach, index) => {
+        return (
+          <ApproachBlock
+            key={index}
+            name={approach.name}
+            description={approach.description}
+            executor={approach.executor}
+          ></ApproachBlock>
+        )
+      })}
+      <button>Check all close</button>
     </>
   )
 }
