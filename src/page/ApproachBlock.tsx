@@ -3,31 +3,30 @@ import React, { useState } from 'react'
 type Props = {
   name: string
   description: string
-  executor: () => { time: number; dist: number[][] }
+  executor: () => Promise<{ time: number; dist: number[][] }>
 }
 
 const BlockStyle: React.CSSProperties = {
-  border: '1px solid black',
-  margin: '10px',
-  padding: '10px',
+  border: '1px solid gray',
+  margin: '1em',
+  padding: '1em',
 }
 
 export default function ApproachBlock({ name, description, executor }: Props) {
   const [timeElapsed, setTimeElapsed] = useState(-1)
 
-  function handleRunClicked() {
-    executor()
-    setTimeElapsed(-1)
+  async function handleRunClicked() {
+    const { time } = await executor()
+    setTimeElapsed(time)
   }
 
   return (
     <div style={BlockStyle}>
-      <button onClick={handleRunClicked}>Run</button>
-      <p>
-        {name}
-        {description}
-        {timeElapsed}
-      </p>
+      <p style={{ fontWeight: 'bold' }}>{name}</p>
+      <p>{description}</p>
+      <p>Time Elapsed: {timeElapsed < 0 ? 'N/A' : timeElapsed.toFixed(2) + ' ms'}</p>
+      <button onClick={handleRunClicked}>Run</button>&nbsp;
+      <button>Inspect</button>
     </div>
   )
 }

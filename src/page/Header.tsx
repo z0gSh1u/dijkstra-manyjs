@@ -25,9 +25,10 @@ export default function Header() {
     <div style={headerStyle}>
       <div>
         <p style={titleStyle}>🧮 Dijkstra ManyJS</p>
-        <p>
+        <p style={{ lineHeight: 1.5 }}>
           Comparison of Dijkstra Shortest Path algorithm implemented by
-          different JavaScript approaches.
+          different JavaScript approaches. The graph is stored by adjacency
+          matrix.
         </p>
       </div>
       <div>

@@ -1,22 +1,27 @@
-import { buildGraph, readGraphFile } from '../common'
+import { compileWGSLTemplate } from '../common'
 import ShaderCode from './dijkstra.wgsl'
 
-export async function main() {
-  const size = 500
-  const inf = 0
-  const graph = buildGraph(await readGraphFile(`./graph/${size}.graph`))
-  let flattenGraph = new Float32Array(graph.flat())
-  flattenGraph = flattenGraph.map((v) => (v === Infinity ? inf : v))
-
+export async function getGPUAdapterInfo() {
   const adapter = (await navigator.gpu.requestAdapter()) as GPUAdapter
   const adapterInfo = await adapter.requestAdapterInfo()
-  console.log(adapterInfo)
+
+  return adapterInfo
+}
+
+export async function dijkstra(graph: number[][]) {
+  const size = graph.length
+  const INF = 0
+  const flattenGraph = new Float32Array(
+    graph.flat().map((v) => (v === Infinity ? INF : v))
+  )
+
+  const adapter = (await navigator.gpu.requestAdapter()) as GPUAdapter
 
   const device = await adapter.requestDevice()
 
   const module = device.createShaderModule({
     label: 'dijkstra_shader',
-    code: ShaderCode,
+    code: compileWGSLTemplate(ShaderCode, { SIZE: size }),
   })
 
   const pipeline = device.createComputePipeline({
@@ -82,5 +87,5 @@ export async function main() {
   await distReadBuffer.mapAsync(GPUMapMode.READ)
   const result = new Float32Array(distReadBuffer.getMappedRange())
 
-  console.log(result)
+  return result
 }
