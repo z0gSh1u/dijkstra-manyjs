@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 type Props = {
   name: string
@@ -14,9 +14,11 @@ const BlockStyle: React.CSSProperties = {
 
 export default function ApproachBlock({ name, description, executor }: Props) {
   const [timeElapsed, setTimeElapsed] = useState(-1)
+  const distRef = useRef<number[][]>()
 
   async function handleRunClicked() {
-    const { time } = await executor()
+    const { time, dist } = await executor()
+    distRef.current = dist
     setTimeElapsed(time)
   }
 
@@ -24,9 +26,11 @@ export default function ApproachBlock({ name, description, executor }: Props) {
     <div style={BlockStyle}>
       <p style={{ fontWeight: 'bold' }}>{name}</p>
       <p>{description}</p>
-      <p>Time Elapsed: {timeElapsed < 0 ? 'N/A' : timeElapsed.toFixed(2) + ' ms'}</p>
+      <p>
+        Time Elapsed: {timeElapsed < 0 ? 'N/A' : timeElapsed.toFixed(2) + ' ms'}
+      </p>
       <button onClick={handleRunClicked}>Run</button>&nbsp;
-      <button>Inspect</button>
+      <button onClick={() => console.log(distRef.current)}>Inspect</button>
     </div>
   )
 }
