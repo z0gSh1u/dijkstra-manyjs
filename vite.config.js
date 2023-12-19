@@ -12,4 +12,7 @@ export default defineConfig({
       namedExport: false,
     }),
   ],
+  build: {
+    target: 'esnext',
+  }
 })
