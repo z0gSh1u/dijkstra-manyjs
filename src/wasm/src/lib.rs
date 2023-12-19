@@ -1,3 +1,6 @@
+// This is the implementation of Dijkstra's algorithm in WASM (Rust).
+// by z0gSh1u @ 2023/12
+
 use std::usize;
 use wasm_bindgen::prelude::*;
 

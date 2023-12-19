@@ -1,13 +1,24 @@
+// This is the implementation of Dijkstra's algorithm in WebGPU.
+// by z0gSh1u @ 2023/12
+
 import { compileWGSLTemplate } from '../common'
 import ShaderCode from './dijkstra.wgsl'
 
+/**
+ * Get GPUAdapterInfo of WebGPU.
+ */
 export async function getGPUAdapterInfo() {
-  const adapter = (await navigator.gpu.requestAdapter()) as GPUAdapter
-  const adapterInfo = await adapter.requestAdapterInfo()
+  const adapter = await navigator.gpu.requestAdapter()
+  if (!adapter) {
+    throw new Error('WebGPU is not supported in this browser.')
+  }
 
-  return adapterInfo
+  return await adapter.requestAdapterInfo()
 }
 
+/**
+ * Dijkstra algorithm implemented with WebGPU parallelly.
+ */
 export async function dijkstra(graph: number[][]) {
   const size = graph.length
   const INF = 0
@@ -72,7 +83,7 @@ export async function dijkstra(graph: number[][]) {
   const pass = encoder.beginComputePass()
   pass.setPipeline(pipeline)
   pass.setBindGroup(0, bindGroup)
-  pass.dispatchWorkgroups(100, 5, 1)
+  pass.dispatchWorkgroups(100, Math.ceil(size / 100), 1)
   pass.end()
   encoder.copyBufferToBuffer(
     distBuffer,
